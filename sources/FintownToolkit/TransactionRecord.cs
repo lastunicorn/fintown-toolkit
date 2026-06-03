@@ -6,9 +6,7 @@ public class TransactionRecord
 
 	public string Project { get; init; }
 
-	public decimal Amount { get; init; }
-
-	public string Currency { get; init; }
+	public CurrencyAmount Amount { get; init; }
 
 	public string Status { get; init; }
 

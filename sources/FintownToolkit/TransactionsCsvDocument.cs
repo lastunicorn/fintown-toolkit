@@ -19,7 +19,7 @@ public partial class TransactionsCsvDocument
 	public static async Task<TransactionsCsvDocument> LoadFromFile(string filePath)
 	{
 		if (filePath == null) throw new ArgumentNullException(nameof(filePath));
-		
+
 		if (string.IsNullOrWhiteSpace(filePath))
 			throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
 
@@ -83,30 +83,23 @@ public partial class TransactionsCsvDocument
 
 	private static TransactionRecord ParseTransaction(IReadOnlyList<string> fields, int lineNumber)
 	{
-		DateTime date = DateTime.ParseExact(fields[4], "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-		(decimal amount, string currency) = ParseAmount(fields[2], lineNumber);
-
-		return new TransactionRecord
+		try
 		{
-			Description = fields[0],
-			Project = fields[1],
-			Amount = amount,
-			Currency = currency,
-			Status = fields[3],
-			Date = date
-		};
-	}
+			DateTime date = DateTime.ParseExact(fields[4], "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+			CurrencyAmount amount = CurrencyAmount.Parse(fields[2]);
 
-	private static (decimal Amount, string Currency) ParseAmount(string amountText, int lineNumber)
-	{
-		string[] parts = amountText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-		if (parts.Length != 2)
-			throw new FormatException($"Invalid amount format at line {lineNumber}: '{amountText}'.");
-
-		if (!decimal.TryParse(parts[0], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal amount))
-			throw new FormatException($"Invalid numeric amount at line {lineNumber}: '{parts[0]}'.");
-
-		return (amount, parts[1]);
+			return new TransactionRecord
+			{
+				Description = fields[0],
+				Project = fields[1],
+				Amount = amount,
+				Status = fields[3],
+				Date = date
+			};
+		}
+		catch (Exception ex)
+		{
+			throw new DocumentLoadException($"Invalid line {lineNumber}", ex);
+		}
 	}
 }
