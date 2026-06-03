@@ -56,7 +56,7 @@ public class TransactionsDocument
 		}
 		catch (Exception ex)
 		{
-			throw new DocumentLoadException("Failed to load transactions CSV from stream.", ex);
+			throw new DocumentLoadException("Failed to load transactions CSV.", ex);
 		}
 	}
 }

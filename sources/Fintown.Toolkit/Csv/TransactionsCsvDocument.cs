@@ -49,7 +49,7 @@ internal sealed class TransactionsCsvDocument : IDisposable
 	public async IAsyncEnumerable<TransactionRecord> ReadTransactions()
 	{
 		if (state == CsvDocumentReadState.HeaderRow)
-			columnHeaders = ReadHeaderRow();
+			columnHeaders = await ReadHeaderRow();
 
 		if (state != CsvDocumentReadState.DataRow)
 			throw new InvalidOperationException("CSV document is not in a valid state to read transactions.");
@@ -60,7 +60,7 @@ internal sealed class TransactionsCsvDocument : IDisposable
 			int lineNumber = csvReader.Parser.RawRow;
 
 			if (fields.Length != columnHeaders.Length)
-				throw new InvalidCsvRecordException(lineNumber, $"CSV line {lineNumber} has {fields.Length} columns, but {columnHeaders.Length} were expected.");
+				throw new InvalidCsvRecordLengthException(lineNumber, columnHeaders.Length, fields.Length);
 
 			yield return ParseTransactionRecord(fields, lineNumber);
 		}
@@ -68,16 +68,24 @@ internal sealed class TransactionsCsvDocument : IDisposable
 		state = CsvDocumentReadState.Ended;
 	}
 
-	private string[] ReadHeaderRow()
+	private async Task<string[]> ReadHeaderRow()
 	{
-		string[] headers = csvReader.Parser.Record ?? [];
+		while (await csvReader.ReadAsync())
+		{
+			string[] values = csvReader.Parser.Record;
 
-		if (headers.Length == 0)
-			throw new DocumentLoadException("CSV header line is empty.");
+			if (values == null || values.Length == 0)
+				continue;
 
-		state = CsvDocumentReadState.DataRow;
+			if (values.Length != 5)
+				throw new DocumentLoadException($"CSV header line has {values.Length} columns, but 5 were expected.");
 
-		return headers;
+			state = CsvDocumentReadState.DataRow;
+
+			return values;
+		}
+
+		throw new DataHeaderMissingException();
 	}
 
 	private static TransactionRecord ParseTransactionRecord(IReadOnlyList<string> fields, int lineNumber)
@@ -95,7 +103,7 @@ internal sealed class TransactionsCsvDocument : IDisposable
 		}
 		catch (Exception ex)
 		{
-			throw new InvalidCsvRecordException(lineNumber, $"Invalid CSV record at line {lineNumber}.", ex);
+			throw new InvalidCsvRecordException(lineNumber, ex);
 		}
 	}
 
