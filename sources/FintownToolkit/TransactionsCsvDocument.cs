@@ -85,16 +85,13 @@ public partial class TransactionsCsvDocument
 	{
 		try
 		{
-			DateTime date = DateTime.ParseExact(fields[4], "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-			CurrencyAmount amount = CurrencyAmount.Parse(fields[2]);
-
 			return new TransactionRecord
 			{
 				Description = fields[0],
 				Project = fields[1],
-				Amount = amount,
+				Amount = fields[2],
 				Status = fields[3],
-				Date = date
+				Date = DateTime.ParseExact(fields[4], "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
 			};
 		}
 		catch (Exception ex)

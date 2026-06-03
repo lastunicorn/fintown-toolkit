@@ -43,6 +43,14 @@ public readonly record struct CurrencyAmount(decimal Value, string Currency)
 	{
 		return $"{Value.ToString("0.00", CultureInfo.InvariantCulture)} {Currency}";
 	}
+
+	public static implicit operator CurrencyAmount(string text)
+	{
+		return Parse(text);
+	}
+
+	public static implicit operator string(CurrencyAmount amount)
+	{
+		return amount.ToString();
+	}
 }
-
-
