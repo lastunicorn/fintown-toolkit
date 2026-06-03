@@ -1,4 +1,8 @@
-﻿namespace DustInTheWind.FintownToolkit;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using System.Globalization;
+
+namespace DustInTheWind.FintownToolkit;
 
 public partial class TransactionsCsvDocument
 {
@@ -21,12 +25,16 @@ public partial class TransactionsCsvDocument
 
 		try
 		{
-			TransactionsCsvDocument document = new TransactionsCsvDocument();
+			TransactionsCsvDocument document = new();
 
-			using StreamReader reader = File.OpenText(filePath);
-			await document.LoadAsync(reader);
+			using StreamReader streamReader = File.OpenText(filePath);
+			await document.LoadAsync(streamReader);
 
 			return document;
+		}
+		catch (DocumentLoadException)
+		{
+			throw;
 		}
 		catch (Exception ex)
 		{
@@ -34,49 +42,48 @@ public partial class TransactionsCsvDocument
 		}
 	}
 
-	private async Task LoadAsync(StreamReader reader)
+	private async Task LoadAsync(StreamReader streamReader)
 	{
-		// The first 3 lines contain metadata and are intentionally ignored.
-		SkipLine(reader, 1);
-		SkipLine(reader, 2);
-		SkipLine(reader, 3);
+		CsvConfiguration configuration = new(CultureInfo.InvariantCulture)
+		{
+			HasHeaderRecord = false,
+			IgnoreBlankLines = true
+		};
 
-		int lineNumber = 4;
-		string headerLine = await reader.ReadLineAsync() ?? throw new FormatException("CSV file does not contain a column header line.");
-		List<string> headers = ParseCsvLine(headerLine, lineNumber);
+		using CsvReader csvReader = new(streamReader, configuration);
 
-		if (headers.Count == 0)
-			throw new FormatException("CSV header line is empty.");
+		for (int i = 1; i <= 3; i++)
+		{
+			if (!await csvReader.ReadAsync())
+				throw new DocumentLoadException($"CSV file ended before header line {i}.");
+		}
+
+		if (!await csvReader.ReadAsync())
+			throw new DocumentLoadException("CSV file does not contain a column header line.");
+
+		string[] headers = csvReader.Parser.Record ?? [];
+
+		if (headers.Length == 0)
+			throw new DocumentLoadException("CSV header line is empty.");
 
 		columnHeaders.Clear();
 		columnHeaders.AddRange(headers);
 
-		while (!reader.EndOfStream)
+		while (await csvReader.ReadAsync())
 		{
-			lineNumber++;
-			string line = await reader.ReadLineAsync();
+			string[] fields = csvReader.Parser.Record ?? [];
+			int lineNumber = csvReader.Parser.RawRow;
 
-			if (string.IsNullOrWhiteSpace(line))
-				continue;
-
-			List<string> fields = ParseCsvLine(line, lineNumber);
-
-			if (fields.Count != headers.Count)
-				throw new FormatException($"CSV line {lineNumber} has {fields.Count} columns, but {headers.Count} were expected.");
+			if (fields.Length != headers.Length)
+				throw new FormatException($"CSV line {lineNumber} has {fields.Length} columns, but {headers.Length} were expected.");
 
 			Transactions.Add(ParseTransaction(fields, lineNumber));
 		}
 	}
 
-	private static void SkipLine(StreamReader reader, int lineNumber)
+	private static TransactionRecord ParseTransaction(IReadOnlyList<string> fields, int lineNumber)
 	{
-		if (reader.ReadLine() is null)
-			throw new FormatException($"CSV file ended before header line {lineNumber}.");
-	}
-
-	private static TransactionRecord ParseTransaction(List<string> fields, int lineNumber)
-	{
-		DateTime date = DateTime.ParseExact(fields[4], "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+		DateTime date = DateTime.ParseExact(fields[4], "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 		(decimal amount, string currency) = ParseAmount(fields[2], lineNumber);
 
 		return new TransactionRecord
@@ -97,52 +104,9 @@ public partial class TransactionsCsvDocument
 		if (parts.Length != 2)
 			throw new FormatException($"Invalid amount format at line {lineNumber}: '{amountText}'.");
 
-		if (!decimal.TryParse(parts[0], System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out decimal amount))
+		if (!decimal.TryParse(parts[0], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal amount))
 			throw new FormatException($"Invalid numeric amount at line {lineNumber}: '{parts[0]}'.");
 
 		return (amount, parts[1]);
-	}
-
-	private static List<string> ParseCsvLine(string line, int lineNumber)
-	{
-		List<string> fields = [];
-		System.Text.StringBuilder currentField = new();
-		bool inQuotes = false;
-
-		for (int i = 0; i < line.Length; i++)
-		{
-			char currentChar = line[i];
-
-			if (currentChar == '"')
-			{
-				if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
-				{
-					currentField.Append('"');
-					i++;
-				}
-				else
-				{
-					inQuotes = !inQuotes;
-				}
-
-				continue;
-			}
-
-			if (currentChar == ',' && !inQuotes)
-			{
-				fields.Add(currentField.ToString());
-				currentField.Clear();
-				continue;
-			}
-
-			currentField.Append(currentChar);
-		}
-
-		if (inQuotes)
-			throw new FormatException($"Unterminated quoted field at line {lineNumber}.");
-
-		fields.Add(currentField.ToString());
-
-		return fields;
 	}
 }
