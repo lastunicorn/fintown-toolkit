@@ -14,13 +14,13 @@ internal sealed class TransactionsCsvDocument : IDisposable
 	{
 		if (textReader == null) throw new ArgumentNullException(nameof(textReader));
 
-		CsvConfiguration configuration = new(CultureInfo.InvariantCulture)
+		CsvConfiguration csvConfiguration = new(CultureInfo.InvariantCulture)
 		{
 			HasHeaderRecord = false,
 			IgnoreBlankLines = true
 		};
 
-		csvReader = new(textReader, configuration);
+		csvReader = new(textReader, csvConfiguration);
 	}
 
 	public async Task<TransactionsCsvHeader> ReadDocumentHeader()

@@ -1,34 +1,23 @@
 namespace DustInTheWind.Fintown.Toolkit;
 
-public readonly struct TransactionDescription : IEquatable<TransactionDescription>
+public sealed record class TransactionDescription
 {
 	public static readonly TransactionDescription InvestingFunds = new("Investing funds");
 	public static readonly TransactionDescription DepositFunds = new("Deposit funds");
 	public static readonly TransactionDescription InterestPayOut = new("Interest Pay-Out");
 
+	private static readonly Dictionary<string, TransactionDescription> KnownValues = new(StringComparer.Ordinal)
+	{
+		[InvestingFunds.Value] = InvestingFunds,
+		[DepositFunds.Value] = DepositFunds,
+		[InterestPayOut.Value] = InterestPayOut
+	};
+
 	public string Value { get; }
 
 	public TransactionDescription(string value)
 	{
-		if (value is null)
-			throw new ArgumentNullException(nameof(value));
-
-		Value = value;
-	}
-
-	public bool Equals(TransactionDescription other)
-	{
-		return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
-	}
-
-	public override bool Equals(object obj)
-	{
-		return obj is TransactionDescription other && Equals(other);
-	}
-
-	public override int GetHashCode()
-	{
-		return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+		Value = value ?? throw new ArgumentNullException(nameof(value));
 	}
 
 	public override string ToString()
@@ -36,23 +25,15 @@ public readonly struct TransactionDescription : IEquatable<TransactionDescriptio
 		return Value;
 	}
 
-	public static bool operator ==(TransactionDescription left, TransactionDescription right)
-	{
-		return left.Equals(right);
-	}
-
-	public static bool operator !=(TransactionDescription left, TransactionDescription right)
-	{
-		return !left.Equals(right);
-	}
-
 	public static implicit operator TransactionDescription(string value)
 	{
-		return new TransactionDescription(value);
+		return value == null
+			? null
+			: new TransactionDescription(value);
 	}
 
 	public static implicit operator string(TransactionDescription description)
 	{
-		return description.Value;
+		return description?.Value;
 	}
 }
