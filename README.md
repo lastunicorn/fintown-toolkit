@@ -47,10 +47,9 @@ Create a small console app and parse your exported file:
 ```csharp
 using DustInTheWind.Fintown.Toolkit;
 
-DocumentLoadResult result = TransactionsCsvDocument.LoadFromFile("transactions.csv");
-TransactionsCsvDocument document = result.Document;
+TransactionsDocument document = TransactionsDocument.LoadFromFile("transactions.csv");
 
-foreach (Transaction transaction in document)
+foreach (TransactionRecord transaction in document)
 {
 	...
 }
@@ -60,30 +59,18 @@ foreach (Transaction transaction in document)
 
 Each row is mapped to:
 
-- `Description` (`string`)
-    
+- `Description` (`TransactionDescription`)
+  
 - `Project` (`string`)
-- `Amount` (`Amount`)
-- `Status` (`string`)
+- `Amount` (`CurrencyAmount`)
+- `Status` (`TransactionStatus`)
 - `Date` (`DateTime`)
-
-## Parsing Diagnostics
-
-When a document is parsed using `TransactionsCsvDocument.LoadFromFile()`, both the parsed data and parsing diagnostics are
-returned.
-
-```csharp
-using DustInTheWind.Fintown.Toolkit;
-
-DocumentLoadResult result = TransactionsCsvDocument.LoadFromFile("transactions.csv");
-DocumentParsingDiagnostics = result.Diagnostics;
-```
 
 ## Demo Project
 
-The repository includes a sample CLI project in `sources/Fintown.Toolkit.Cli` that demonstrates:
+The repository includes a sample CLI project in `sources/Fintown.Toolkit.Demo` that demonstrates:
 
 - reading `transactions.csv`
-- printing parsed data and diagnostics.
+- printing parsed data.
 
 You can use this project as a reference implementation for your own importer/exporter tools.
