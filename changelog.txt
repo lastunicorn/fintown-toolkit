@@ -3,4 +3,4 @@ Fintown Toolkit
 
 v1.0.0
 --------------------------------------------------------------------------------
-
+[new] Added TransactionsDocument to parse csv transaction files.
