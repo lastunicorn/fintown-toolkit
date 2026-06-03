@@ -10,17 +10,14 @@ public class TransactionsDocument
 
 	public List<TransactionRecord> Transactions { get; } = [];
 
-	public static async Task<TransactionsDocument> LoadFromFileAsync(string filePath)
+	public static Task<TransactionsDocument> LoadFromFileAsync(string filePath)
 	{
-		if (filePath == null) throw new ArgumentNullException(nameof(filePath));
-
-		if (string.IsNullOrWhiteSpace(filePath))
-			throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
+		ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
 		try
 		{
 			using StreamReader streamReader = File.OpenText(filePath);
-			return await LoadAsync(streamReader);
+			return LoadInternalAsync(streamReader);
 		}
 		catch (DocumentLoadException)
 		{
@@ -28,18 +25,87 @@ public class TransactionsDocument
 		}
 		catch (Exception ex)
 		{
-			throw new DocumentLoadException("Failed to load transactions CSV file.", ex);
+			throw new DocumentLoadException(ex);
 		}
 	}
-	
-	public static async Task<TransactionsDocument> LoadAsync(StreamReader streamReader)
+
+	public static Task<TransactionsDocument> LoadAsync(string csv)
 	{
-		if (streamReader == null) throw new ArgumentNullException(nameof(streamReader));
-		
+		ArgumentException.ThrowIfNullOrWhiteSpace(csv);
+
+		try
+		{
+			using StringReader stringReader = new(csv);
+			return LoadInternalAsync(stringReader);
+		}
+		catch (DocumentLoadException)
+		{
+			throw;
+		}
+		catch (Exception ex)
+		{
+			throw new DocumentLoadException(ex);
+		}
+	}
+
+	public static Task<TransactionsDocument> LoadAsync(Stream stream)
+	{
+		ArgumentNullException.ThrowIfNull(stream);
+
+		try
+		{
+			using StreamReader streamReader = new(stream);
+			return LoadInternalAsync(streamReader);
+		}
+		catch (DocumentLoadException)
+		{
+			throw;
+		}
+		catch (Exception ex)
+		{
+			throw new DocumentLoadException(ex);
+		}
+	}
+
+	public static Task<TransactionsDocument> LoadAsync(FileInfo fileInfo)
+	{
+		ArgumentNullException.ThrowIfNull(fileInfo);
+
+		try
+		{
+			using StreamReader streamReader = fileInfo.OpenText();
+			return LoadInternalAsync(streamReader);
+		}
+		catch (DocumentLoadException)
+		{
+			throw;
+		}
+		catch (Exception ex)
+		{
+			throw new DocumentLoadException(ex);
+		}
+	}
+
+	public static Task<TransactionsDocument> LoadAsync(StreamReader streamReader)
+	{
+		ArgumentNullException.ThrowIfNull(streamReader);
+
+		return LoadInternalAsync(streamReader);
+	}
+
+	public static Task<TransactionsDocument> LoadAsync(TextReader textReader)
+	{
+		ArgumentNullException.ThrowIfNull(textReader);
+
+		return LoadInternalAsync(textReader);
+	}
+
+	private static async Task<TransactionsDocument> LoadInternalAsync(TextReader textReader)
+	{
 		try
 		{
 			TransactionsDocument document = new();
-			TransactionsCsvDocument transactionsCsvDocument = new(streamReader);
+			TransactionsCsvDocument transactionsCsvDocument = new(textReader);
 
 			TransactionsCsvHeader header = await transactionsCsvDocument.ReadDocumentHeader();
 			document.DateFrom = header.DateFrom;
@@ -56,7 +122,7 @@ public class TransactionsDocument
 		}
 		catch (Exception ex)
 		{
-			throw new DocumentLoadException("Failed to load transactions CSV.", ex);
+			throw new DocumentLoadException(ex);
 		}
 	}
 }

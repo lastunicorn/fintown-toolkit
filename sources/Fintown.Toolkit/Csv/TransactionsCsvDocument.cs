@@ -10,9 +10,9 @@ internal sealed class TransactionsCsvDocument : IDisposable
 	private CsvDocumentReadState state;
 	private string[] columnHeaders;
 
-	public TransactionsCsvDocument(StreamReader streamReader)
+	public TransactionsCsvDocument(TextReader textReader)
 	{
-		if (streamReader == null) throw new ArgumentNullException(nameof(streamReader));
+		if (textReader == null) throw new ArgumentNullException(nameof(textReader));
 
 		CsvConfiguration configuration = new(CultureInfo.InvariantCulture)
 		{
@@ -20,7 +20,7 @@ internal sealed class TransactionsCsvDocument : IDisposable
 			IgnoreBlankLines = true
 		};
 
-		csvReader = new(streamReader, configuration);
+		csvReader = new(textReader, configuration);
 	}
 
 	public async Task<TransactionsCsvHeader> ReadDocumentHeader()
