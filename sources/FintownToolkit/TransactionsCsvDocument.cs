@@ -75,7 +75,7 @@ public partial class TransactionsCsvDocument
 			int lineNumber = csvReader.Parser.RawRow;
 
 			if (fields.Length != headers.Length)
-				throw new FormatException($"CSV line {lineNumber} has {fields.Length} columns, but {headers.Length} were expected.");
+				throw new DocumentLoadException($"CSV line {lineNumber} has {fields.Length} columns, but {headers.Length} were expected.");
 
 			Transactions.Add(ParseTransaction(fields, lineNumber));
 		}
