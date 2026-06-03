@@ -1,4 +1,4 @@
-namespace DustInTheWind.FintownToolkit;
+namespace DustInTheWind.Fintown.Toolkit;
 
 public class InvalidCsvRecordException : DocumentLoadException
 {

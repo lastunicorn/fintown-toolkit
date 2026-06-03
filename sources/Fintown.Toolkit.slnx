@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Common/">
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Project Path="Fintown.Toolkit.Demo\Fintown.Toolkit.Demo.csproj" />
+  <Project Path="Fintown.Toolkit\Fintown.Toolkit.csproj" />
+</Solution>

@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace DustInTheWind.FintownToolkit;
+namespace DustInTheWind.Fintown.Toolkit;
 
 public readonly record struct CurrencyAmount(decimal Value, string Currency)
 {

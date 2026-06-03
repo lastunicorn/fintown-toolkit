@@ -1,6 +1,6 @@
-﻿using DustInTheWind.FintownToolkit.Csv;
+﻿using DustInTheWind.Fintown.Toolkit.Csv;
 
-namespace DustInTheWind.FintownToolkit;
+namespace DustInTheWind.Fintown.Toolkit;
 
 public class TransactionsDocument
 {

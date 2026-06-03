@@ -1,4 +1,4 @@
-namespace DustInTheWind.FintownToolkit.Csv;
+namespace DustInTheWind.Fintown.Toolkit.Csv;
 
 internal enum CsvDocumentReadState
 {

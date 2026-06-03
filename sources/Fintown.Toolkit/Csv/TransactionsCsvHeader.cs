@@ -1,7 +1,7 @@
 using System.Globalization;
 using CsvHelper;
 
-namespace DustInTheWind.FintownToolkit.Csv;
+namespace DustInTheWind.Fintown.Toolkit.Csv;
 
 internal class TransactionsCsvHeader
 {

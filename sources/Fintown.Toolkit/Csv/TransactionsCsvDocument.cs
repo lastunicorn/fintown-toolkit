@@ -2,7 +2,7 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace DustInTheWind.FintownToolkit.Csv;
+namespace DustInTheWind.Fintown.Toolkit.Csv;
 
 internal sealed class TransactionsCsvDocument : IDisposable
 {
