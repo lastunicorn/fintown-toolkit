@@ -10,14 +10,14 @@ public class TransactionsDocument
 
 	public List<TransactionRecord> Transactions { get; } = [];
 
-	public static Task<TransactionsDocument> LoadFromFileAsync(string filePath)
+	public static async Task<TransactionsDocument> LoadFromFileAsync(string filePath)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
 		try
 		{
 			using StreamReader streamReader = File.OpenText(filePath);
-			return LoadInternalAsync(streamReader);
+			return await LoadInternalAsync(streamReader);
 		}
 		catch (DocumentLoadException)
 		{
@@ -29,14 +29,14 @@ public class TransactionsDocument
 		}
 	}
 
-	public static Task<TransactionsDocument> LoadAsync(string csv)
+	public static async Task<TransactionsDocument> LoadAsync(string csv)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(csv);
 
 		try
 		{
 			using StringReader stringReader = new(csv);
-			return LoadInternalAsync(stringReader);
+			return await LoadInternalAsync(stringReader);
 		}
 		catch (DocumentLoadException)
 		{
@@ -48,14 +48,14 @@ public class TransactionsDocument
 		}
 	}
 
-	public static Task<TransactionsDocument> LoadAsync(Stream stream)
+	public static async Task<TransactionsDocument> LoadAsync(Stream stream)
 	{
 		ArgumentNullException.ThrowIfNull(stream);
 
 		try
 		{
 			using StreamReader streamReader = new(stream);
-			return LoadInternalAsync(streamReader);
+			return await LoadInternalAsync(streamReader);
 		}
 		catch (DocumentLoadException)
 		{
@@ -67,14 +67,14 @@ public class TransactionsDocument
 		}
 	}
 
-	public static Task<TransactionsDocument> LoadAsync(FileInfo fileInfo)
+	public static async Task<TransactionsDocument> LoadAsync(FileInfo fileInfo)
 	{
 		ArgumentNullException.ThrowIfNull(fileInfo);
 
 		try
 		{
 			using StreamReader streamReader = fileInfo.OpenText();
-			return LoadInternalAsync(streamReader);
+			return await LoadInternalAsync(streamReader);
 		}
 		catch (DocumentLoadException)
 		{
