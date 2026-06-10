@@ -3,13 +3,13 @@ using CsvHelper;
 
 namespace DustInTheWind.Fintown.Toolkit.Csv;
 
-internal class TransactionsCsvHeader
+internal class CsvDocumentHeader
 {
 	public DateOnly DateFrom { get; private init; }
 
 	public DateOnly DateTo { get; private init; }
 
-	public static async Task<TransactionsCsvHeader> Parse(CsvReader csvReader)
+	public static async Task<CsvDocumentHeader> Parse(CsvReader csvReader)
 	{
 		if (!await csvReader.ReadAsync())
 			throw new DocumentLoadException("CSV file ended before line 1 (Transaction history).");
@@ -29,7 +29,7 @@ internal class TransactionsCsvHeader
 		if (!await csvReader.ReadAsync())
 			throw new DocumentLoadException("CSV file does not contain a column header line.");
 
-		return new TransactionsCsvHeader
+		return new CsvDocumentHeader
 		{
 			DateFrom = dateFrom,
 			DateTo = dateTo

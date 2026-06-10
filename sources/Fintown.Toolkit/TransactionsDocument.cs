@@ -105,13 +105,13 @@ public class TransactionsDocument
 		try
 		{
 			TransactionsDocument document = new();
-			TransactionsCsvDocument transactionsCsvDocument = new(textReader);
+			CsvTransactionsDocument csvTransactionsDocument = new(textReader);
 
-			TransactionsCsvHeader header = await transactionsCsvDocument.ReadDocumentHeader();
+			CsvDocumentHeader header = await csvTransactionsDocument.ReadDocumentHeader();
 			document.DateFrom = header.DateFrom;
 			document.DateTo = header.DateTo;
 
-			await foreach (TransactionRecord transaction in transactionsCsvDocument.ReadTransactions())
+			await foreach (TransactionRecord transaction in csvTransactionsDocument.ReadTransactions())
 				document.Transactions.Add(transaction);
 
 			return document;

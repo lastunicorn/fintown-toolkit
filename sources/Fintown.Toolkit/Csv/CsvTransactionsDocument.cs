@@ -4,13 +4,13 @@ using CsvHelper.Configuration;
 
 namespace DustInTheWind.Fintown.Toolkit.Csv;
 
-internal sealed class TransactionsCsvDocument : IDisposable
+internal sealed class CsvTransactionsDocument : IDisposable
 {
 	private readonly CsvReader csvReader;
 	private CsvDocumentReadState state;
 	private string[] columnHeaders;
 
-	public TransactionsCsvDocument(TextReader textReader)
+	public CsvTransactionsDocument(TextReader textReader)
 	{
 		if (textReader == null) throw new ArgumentNullException(nameof(textReader));
 
@@ -23,14 +23,14 @@ internal sealed class TransactionsCsvDocument : IDisposable
 		csvReader = new(textReader, csvConfiguration);
 	}
 
-	public async Task<TransactionsCsvHeader> ReadDocumentHeader()
+	public async Task<CsvDocumentHeader> ReadDocumentHeader()
 	{
 		if (state != CsvDocumentReadState.DocumentHeader)
 			throw new InvalidOperationException("CSV document header has already been read.");
 
 		try
 		{
-			TransactionsCsvHeader header = await TransactionsCsvHeader.Parse(csvReader);
+			CsvDocumentHeader header = await CsvDocumentHeader.Parse(csvReader);
 			state = CsvDocumentReadState.HeaderRow;
 			return header;
 		}
