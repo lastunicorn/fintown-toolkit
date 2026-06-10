@@ -1,5 +1,7 @@
 # Fintown Toolkit
 
+[![GitHub Repo](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/lastunicorn/fintown-toolkit) [![GitHub Build](https://img.shields.io/github/actions/workflow/status/lastunicorn/fintown-toolkit/build-master.yml?logo=github)](https://github.com/lastunicorn/fintown-toolkit/actions/workflows/build-master.yml) [![NuGet Version](https://img.shields.io/nuget/v/DustInTheWind.Fintown.Toolkit?logo=nuget)](https://www.nuget.org/packages/DustInTheWind.Fintown.Toolkit) [![NuGet Downloads](https://img.shields.io/nuget/dt/DustInTheWind.Fintown.Toolkit?logo=nuget)](https://www.nuget.org/packages/DustInTheWind.Fintown.Toolkit)
+
 `Fintown Toolkit` is a .NET library for working with files exported from Fintown.
 
 Fintown is an loan investment platform powered by Vihorev Group based in Czech Republic.
