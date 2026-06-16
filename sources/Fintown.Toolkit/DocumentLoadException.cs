@@ -6,7 +6,7 @@ public class DocumentLoadException : Exception
 		: base("Failed to load transactions CSV file.")
 	{
 	}
-	
+
 	public DocumentLoadException(Exception innerException)
 		: base("Failed to load transactions CSV file.", innerException)
 	{

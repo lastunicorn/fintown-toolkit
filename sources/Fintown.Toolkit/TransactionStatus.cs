@@ -54,4 +54,3 @@ public readonly struct TransactionStatus : IEquatable<TransactionStatus>
 		return status.Value;
 	}
 }
-
