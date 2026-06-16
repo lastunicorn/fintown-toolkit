@@ -6,12 +6,12 @@ public sealed record class TransactionDescription
 	public static readonly TransactionDescription DepositFunds = new("Deposit funds");
 	public static readonly TransactionDescription InterestPayOut = new("Interest Pay-Out");
 
-	private static readonly Dictionary<string, TransactionDescription> KnownValues = new(StringComparer.Ordinal)
-	{
-		[InvestingFunds.Value] = InvestingFunds,
-		[DepositFunds.Value] = DepositFunds,
-		[InterestPayOut.Value] = InterestPayOut
-	};
+	public static readonly IReadOnlyCollection<TransactionDescription> KnownValues =
+	[
+		InvestingFunds,
+		DepositFunds,
+		InterestPayOut
+	];
 
 	public string Value { get; }
 
