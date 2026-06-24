@@ -46,6 +46,26 @@ internal sealed class CsvTransactionsDocument : IDisposable
 		}
 	}
 
+	public async Task<string[]> ReadHeaderRow()
+	{
+		while (await csvReader.ReadAsync())
+		{
+			string[] values = csvReader.Parser.Record;
+
+			if (values == null || values.Length == 0)
+				continue;
+
+			if (values.Length != 5)
+				throw new DocumentLoadException($"CSV header line has {values.Length} columns, but 5 were expected.");
+
+			state = CsvDocumentReadState.DataRow;
+
+			return values;
+		}
+
+		throw new DataHeaderMissingException();
+	}
+
 	public async IAsyncEnumerable<TransactionRecord> ReadTransactions()
 	{
 		if (state == CsvDocumentReadState.HeaderRow)
@@ -66,26 +86,6 @@ internal sealed class CsvTransactionsDocument : IDisposable
 		}
 
 		state = CsvDocumentReadState.Ended;
-	}
-
-	private async Task<string[]> ReadHeaderRow()
-	{
-		while (await csvReader.ReadAsync())
-		{
-			string[] values = csvReader.Parser.Record;
-
-			if (values == null || values.Length == 0)
-				continue;
-
-			if (values.Length != 5)
-				throw new DocumentLoadException($"CSV header line has {values.Length} columns, but 5 were expected.");
-
-			state = CsvDocumentReadState.DataRow;
-
-			return values;
-		}
-
-		throw new DataHeaderMissingException();
 	}
 
 	private static TransactionRecord ParseTransactionRecord(IReadOnlyList<string> fields, int lineNumber)

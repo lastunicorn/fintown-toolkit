@@ -26,9 +26,6 @@ internal class CsvDocumentHeader
 			throw new DocumentLoadException("CSV file ended before line 3 (To date).");
 		DateOnly dateTo = ParseHeaderDate(csvReader.Parser.Record ?? [], "To", 3);
 
-		if (!await csvReader.ReadAsync())
-			throw new DocumentLoadException("CSV file does not contain a column header line.");
-
 		return new CsvDocumentHeader
 		{
 			DateFrom = dateFrom,
