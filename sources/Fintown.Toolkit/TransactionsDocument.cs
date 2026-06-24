@@ -103,17 +103,7 @@ public class TransactionsDocument : Collection<TransactionRecord>
 	{
 		try
 		{
-			TransactionsDocument document = new();
-			CsvTransactionsDocument csvTransactionsDocument = new(textReader);
-
-			CsvDocumentHeader header = await csvTransactionsDocument.ReadDocumentHeader();
-			document.DateFrom = header.DateFrom;
-			document.DateTo = header.DateTo;
-
-			await foreach (TransactionRecord transaction in csvTransactionsDocument.ReadTransactions())
-				document.Add(transaction);
-
-			return document;
+			return await CsvTransactionsDocument.ParseAsync(textReader);
 		}
 		catch (DocumentLoadException)
 		{
