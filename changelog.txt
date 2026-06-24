@@ -6,7 +6,7 @@ v1.2.0 (breaking change)
 [change] TransactionStatus is now a record.
 [change] TransactionsDocument is now a collection and the Transactions property
          was removed. (breaking change)
-[bugfix] TransactionsDocument was ommiting the first transaction from CSV file.
+[bugfix] TransactionsDocument was omitting the first transaction from CSV file.
 
 
 v1.1.0

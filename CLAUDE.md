@@ -22,19 +22,52 @@ There are currently no test projects in the solution.
 
 ## Architecture
 
+### Projects
+
+| Project | Role |
+|---|---|
+| `Fintown.Toolkit.Infrastructure` | General-purpose infrastructure — `StateMachine<TState, TContext>` and `IState<TState, TContext>` |
+| `Fintown.Toolkit` | Domain library — CSV parsing, public API, NuGet package |
+| `Fintown.Toolkit.Demo` | Console app demonstrating the library |
+
+`Fintown.Toolkit` references `Fintown.Toolkit.Infrastructure`.
+
+### State machine (`Fintown.Toolkit.Infrastructure`)
+
+`IState<TState, TContext>` is the interface each state implements. `TState` must be a `struct` enum. `ExecuteAsync` receives the shared context and returns the ID of the next state, or `null` to stop.
+
+`StateMachine<TState, TContext>` dispatches between registered states. Key API:
+
+- Constructor overload accepts a collection of states — the first state registered also becomes `InitialState` if it is not set explicitly.
+- `AddState` / `AddState(IEnumerable<...>)` for incremental registration; both are fluent.
+- `Start(context)` — sets the context and primes `CurrentState` to `InitialState`.
+- `MoveNextAsync()` — executes the current state and advances `CurrentState`. Returns `false` when already stopped.
+- `ExecuteAllAsync(context)` — convenience wrapper: calls `Start` then loops `MoveNextAsync` until done.
+
 ### CSV format
 
-Fintown exports have a 4-line preamble before data rows:
+Fintown exports have a preamble before data rows:
 1. `"Transaction history"`
 2. `"From","<yyyy-MM-dd>"`
 3. `"To","<yyyy-MM-dd>"`
 4. Column header row (5 columns: Description, Project, Amount, Status, Date)
 
-`CsvDocumentReadState` is a state machine enum that enforces this read order inside `CsvTransactionsDocument`.
+### CSV parsing (`Fintown.Toolkit`)
+
+`TransactionsDocument.LoadInternalAsync` is the integration point. It creates the `CsvReader` and `CsvReadContext` directly, wires the state machine, and runs it:
+
+```
+CsvReadState enum          CsvReadContext
+  DocumentHeader   ──▶   ReadDocumentHeaderState
+  ColumnsHeader    ──▶   ReadColumnHeaderState
+  DataRows         ──▶   ReadDataRowsState  ──▶  null (done)
+```
+
+State classes live in `Csv/States/`. `CsvReadContext` carries the `CsvReader`, the `TransactionsDocument` being built, and the parsed `ColumnHeaders` array.
 
 ### Public API surface
 
-`TransactionsDocument` is the single entry point. It exposes six `LoadAsync` overloads accepting a file path, raw CSV string, `Stream`, `FileInfo`, `StreamReader`, or `TextReader`. All delegate to the internal `CsvTransactionsDocument` reader.
+`TransactionsDocument` is the single entry point — it extends `Collection<TransactionRecord>` and exposes six `LoadAsync` overloads accepting a file path, raw CSV string, `Stream`, `FileInfo`, `StreamReader`, or `TextReader`.
 
 Each row maps to `TransactionRecord` (a `record class`) with five properties:
 
@@ -49,10 +82,6 @@ Each row maps to `TransactionRecord` (a `record class`) with five properties:
 ### Value types
 
 `TransactionDescription`, `CurrencyAmount`, and `TransactionStatus` all carry implicit conversions to/from `string`. `TransactionDescription` and `TransactionStatus` expose well-known static instances (e.g. `TransactionDescription.InvestingFunds`). `TransactionDescription` also has a `KnownValues` collection.
-
-### Internal CSV layer
-
-`sources/Fintown.Toolkit/Csv/` contains the internal CSV parsing (using [CsvHelper](https://joshclose.github.io/CsvHelper/)) and is not exposed in the public API.
 
 ### XML documentation
 
