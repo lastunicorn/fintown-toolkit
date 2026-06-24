@@ -11,12 +11,12 @@ internal static class Program
 
 		try
 		{
-			TransactionsDocument document = await TransactionsDocument.LoadFromFileAsync(fileName);
+			TransactionsDocument transactionsDocument = await TransactionsDocument.LoadFromFileAsync(fileName);
 
-			Console.WriteLine($"Loaded {document.Transactions.Count} transactions from {document.DateFrom:yyyy-MM-dd} to {document.DateTo:yyyy-MM-dd}.");
+			Console.WriteLine($"Loaded {transactionsDocument.Count} transactions from {transactionsDocument.DateFrom:yyyy-MM-dd} to {transactionsDocument.DateTo:yyyy-MM-dd}.");
 			Console.WriteLine();
 
-			DataGrid dataGrid = Display(document);
+			DataGrid dataGrid = Display(transactionsDocument);
 			dataGrid.Display();
 		}
 		catch (DocumentLoadException ex)
@@ -31,13 +31,13 @@ internal static class Program
 		}
 	}
 
-	private static DataGrid Display(TransactionsDocument document)
+	private static DataGrid Display(TransactionsDocument transactionsDocument)
 	{
 		DataGrid dataGrid = new()
 		{
-			Title = $"Transactions ({document.DateFrom:yyyy-MM-dd} - {document.DateTo:yyyy-MM-dd})",
+			Title = $"Transactions ({transactionsDocument.DateFrom:yyyy-MM-dd} - {transactionsDocument.DateTo:yyyy-MM-dd})",
 			BorderTemplate = BorderTemplate.PlusMinusBorderTemplate,
-			Footer = $"Count: {document.Transactions.Count}"
+			Footer = $"Count: {transactionsDocument.Count}"
 		};
 
 		dataGrid.Columns.Add("Date");
@@ -46,7 +46,7 @@ internal static class Program
 		dataGrid.Columns.Add("Amount", HorizontalAlignment.Right);
 		dataGrid.Columns.Add("Status");
 
-		foreach (TransactionRecord transaction in document.Transactions)
+		foreach (TransactionRecord transaction in transactionsDocument)
 		{
 			dataGrid.Rows.Add(
 				transaction.Date.ToString("yyyy-MM-dd HH:mm:ss"),

@@ -1,14 +1,13 @@
-﻿using DustInTheWind.Fintown.Toolkit.Csv;
+﻿using System.Collections.ObjectModel;
+using DustInTheWind.Fintown.Toolkit.Csv;
 
 namespace DustInTheWind.Fintown.Toolkit;
 
-public class TransactionsDocument
+public class TransactionsDocument : Collection<TransactionRecord>
 {
 	public DateOnly DateFrom { get; set; }
 
 	public DateOnly DateTo { get; set; }
-
-	public List<TransactionRecord> Transactions { get; } = [];
 
 	public static async Task<TransactionsDocument> LoadFromFileAsync(string filePath)
 	{
@@ -112,7 +111,7 @@ public class TransactionsDocument
 			document.DateTo = header.DateTo;
 
 			await foreach (TransactionRecord transaction in csvTransactionsDocument.ReadTransactions())
-				document.Transactions.Add(transaction);
+				document.Add(transaction);
 
 			return document;
 		}

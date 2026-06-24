@@ -1,9 +1,17 @@
 Fintown Toolkit
 ================================================================================
 
+v1.2.0
+--------------------------------------------------------------------------------
+[change] TransactionStatus is now a record.
+[change] TransactionsDocument is now a collection and the Transactions property
+         was removed.
+
+
 v1.1.0
 --------------------------------------------------------------------------------
 [bugfix] Fixed stream access error on async requests.
+
 
 v1.0.0
 --------------------------------------------------------------------------------

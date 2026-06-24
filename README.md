@@ -49,9 +49,9 @@ Create a small console app and parse your exported file:
 ```csharp
 using DustInTheWind.Fintown.Toolkit;
 
-TransactionsDocument document = TransactionsDocument.LoadFromFile("transactions.csv");
+TransactionsDocument transactionsDocument = await TransactionsDocument.LoadFromFileAsync("transactions.csv");
 
-foreach (TransactionRecord transaction in document)
+foreach (TransactionRecord transaction in transactionsDocument)
 {
 	...
 }
