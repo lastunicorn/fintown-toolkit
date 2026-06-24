@@ -1,5 +1,4 @@
 <Solution>
 	<Project Path="sources/Fintown.Toolkit.Demo/Fintown.Toolkit.Demo.csproj" />
-	<Project Path="sources/Fintown.Toolkit.Infrastructure/Fintown.Toolkit.Infrastructure.csproj" />
 	<Project Path="sources/Fintown.Toolkit/Fintown.Toolkit.csproj" />
 </Solution>

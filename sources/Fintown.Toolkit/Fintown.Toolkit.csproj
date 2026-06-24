@@ -10,10 +10,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CsvHelper" Version="30.0.1" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Fintown.Toolkit.Infrastructure\Fintown.Toolkit.Infrastructure.csproj" />
+		<PackageReference Include="DustInTheWind.Machina" Version="1.0.1" />
 	</ItemGroup>
 
 </Project>
