@@ -1,6 +1,6 @@
 namespace DustInTheWind.Fintown.Toolkit;
 
-public class TransactionRecord
+public record class TransactionRecord
 {
 	public TransactionDescription Description { get; init; }
 

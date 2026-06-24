@@ -8,10 +8,7 @@ public readonly struct TransactionStatus : IEquatable<TransactionStatus>
 
 	public TransactionStatus(string value)
 	{
-		if (value is null)
-			throw new ArgumentNullException(nameof(value));
-
-		Value = value;
+		Value = value ?? throw new ArgumentNullException(nameof(value));
 	}
 
 	public bool Equals(TransactionStatus other)
