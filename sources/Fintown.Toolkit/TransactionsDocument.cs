@@ -1,5 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.Globalization;
+using CsvHelper;
+using CsvHelper.Configuration;
 using DustInTheWind.Fintown.Toolkit.Csv;
+using DustInTheWind.Fintown.Toolkit.Csv.States;
+using DustInTheWind.Fintown.Toolkit.Infrastructure;
 
 namespace DustInTheWind.Fintown.Toolkit;
 
@@ -103,7 +108,39 @@ public class TransactionsDocument : Collection<TransactionRecord>
 	{
 		try
 		{
-			return await CsvTransactionsDocument.ParseAsync(textReader);
+			CsvConfiguration csvConfiguration = new(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+				IgnoreBlankLines = true
+			};
+
+			using CsvReader csvReader = new(textReader, csvConfiguration);
+
+			TransactionsDocument document = new();
+
+			CsvReadContext context = new()
+			{
+				CsvReader = csvReader,
+				Document = document
+			};
+
+			StateMachine<CsvReadState, CsvReadContext> machine = new([
+				new ReadDocumentHeaderState(),
+				new ReadColumnHeaderState(),
+				new ReadDataRowsState()
+			])
+			{
+				InitialState = CsvReadState.DocumentHeader
+			};
+
+			machine.Start(context);
+
+			while (machine.CurrentState != null)
+			{
+				await machine.MoveNextAsync();
+			}
+
+			return document;
 		}
 		catch (DocumentLoadException)
 		{

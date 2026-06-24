@@ -1,8 +1,8 @@
 namespace DustInTheWind.Fintown.Toolkit.Csv;
 
-internal enum CsvReadStep
+internal enum CsvReadState
 {
 	DocumentHeader,
-	ColumnHeader,
+	ColumnsHeader,
 	DataRows
 }

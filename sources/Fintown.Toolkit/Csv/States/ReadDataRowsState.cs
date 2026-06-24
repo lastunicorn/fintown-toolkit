@@ -1,13 +1,13 @@
 using System.Globalization;
 using DustInTheWind.Fintown.Toolkit.Infrastructure;
 
-namespace DustInTheWind.Fintown.Toolkit.Csv.Steps;
+namespace DustInTheWind.Fintown.Toolkit.Csv.States;
 
-internal class ReadDataRowsState : IState<CsvReadStep, CsvReadContext>
+internal class ReadDataRowsState : IState<CsvReadState, CsvReadContext>
 {
-    public CsvReadStep Id => CsvReadStep.DataRows;
+    public CsvReadState Id => CsvReadState.DataRows;
 
-    public async Task<CsvReadStep?> ExecuteAsync(CsvReadContext context)
+    public async Task<CsvReadState?> ExecuteAsync(CsvReadContext context)
     {
         while (await context.CsvReader.ReadAsync())
         {

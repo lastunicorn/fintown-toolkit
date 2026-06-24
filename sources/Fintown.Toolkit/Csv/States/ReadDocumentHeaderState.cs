@@ -2,13 +2,13 @@ using System.Globalization;
 using CsvHelper;
 using DustInTheWind.Fintown.Toolkit.Infrastructure;
 
-namespace DustInTheWind.Fintown.Toolkit.Csv.Steps;
+namespace DustInTheWind.Fintown.Toolkit.Csv.States;
 
-internal class ReadDocumentHeaderState : IState<CsvReadStep, CsvReadContext>
+internal class ReadDocumentHeaderState : IState<CsvReadState, CsvReadContext>
 {
-    public CsvReadStep Id => CsvReadStep.DocumentHeader;
+    public CsvReadState Id => CsvReadState.DocumentHeader;
 
-    public async Task<CsvReadStep?> ExecuteAsync(CsvReadContext context)
+    public async Task<CsvReadState?> ExecuteAsync(CsvReadContext context)
     {
         await Parse(context);
 
@@ -16,7 +16,7 @@ internal class ReadDocumentHeaderState : IState<CsvReadStep, CsvReadContext>
         // context.Document.DateFrom = header.DateFrom;
         // context.Document.DateTo = header.DateTo;
         
-        return CsvReadStep.ColumnHeader;
+        return CsvReadState.ColumnsHeader;
     }
 
     private static async Task Parse(CsvReadContext context)

@@ -1,12 +1,12 @@
 using DustInTheWind.Fintown.Toolkit.Infrastructure;
 
-namespace DustInTheWind.Fintown.Toolkit.Csv.Steps;
+namespace DustInTheWind.Fintown.Toolkit.Csv.States;
 
-internal class ReadColumnHeaderState : IState<CsvReadStep, CsvReadContext>
+internal class ReadColumnHeaderState : IState<CsvReadState, CsvReadContext>
 {
-    public CsvReadStep Id => CsvReadStep.ColumnHeader;
+    public CsvReadState Id => CsvReadState.ColumnsHeader;
 
-    public async Task<CsvReadStep?> ExecuteAsync(CsvReadContext context)
+    public async Task<CsvReadState?> ExecuteAsync(CsvReadContext context)
     {
         while (await context.CsvReader.ReadAsync())
         {
@@ -19,7 +19,7 @@ internal class ReadColumnHeaderState : IState<CsvReadStep, CsvReadContext>
                 throw new DocumentLoadException($"CSV header line has {values.Length} columns, but 5 were expected.");
 
             context.ColumnHeaders = values;
-            return CsvReadStep.DataRows;
+            return CsvReadState.DataRows;
         }
 
         throw new DataHeaderMissingException();

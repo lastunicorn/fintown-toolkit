@@ -4,6 +4,7 @@ public class StateMachine<TState, TContext>
 	where TState : struct, Enum
 {
 	private readonly Dictionary<TState, IState<TState, TContext>> statesById = new();
+	private TContext context;
 
 	public TState? InitialState { get; set; }
 
@@ -13,27 +14,26 @@ public class StateMachine<TState, TContext>
 	{
 	}
 
-	public StateMachine(IEnumerable<IState<TState, TContext>> steps)
+	public StateMachine(IEnumerable<IState<TState, TContext>> states)
 	{
-		ArgumentNullException.ThrowIfNull(steps);
+		ArgumentNullException.ThrowIfNull(states);
 
-		foreach (IState<TState, TContext> step in steps)
-			AddStep(step);
+		foreach (IState<TState, TContext> state in states)
+			AddState(state);
 	}
 
-	public StateMachine<TState, TContext> AddStep(IState<TState, TContext> state)
+	public StateMachine<TState, TContext> AddState(IState<TState, TContext> state)
 	{
 		AddStateInternal(state);
-
 		return this;
 	}
 
-	public StateMachine<TState, TContext> AddState(IEnumerable<IState<TState, TContext>> state)
+	public StateMachine<TState, TContext> AddState(IEnumerable<IState<TState, TContext>> states)
 	{
-		ArgumentNullException.ThrowIfNull(state);
+		ArgumentNullException.ThrowIfNull(states);
 
-		foreach (IState<TState, TContext> step in state)
-			AddStateInternal(step);
+		foreach (IState<TState, TContext> state in states)
+			AddStateInternal(state);
 
 		return this;
 	}
@@ -42,14 +42,14 @@ public class StateMachine<TState, TContext>
 	{
 		ArgumentNullException.ThrowIfNull(state);
 
-		bool isFirstStep = statesById.Count == 0;
+		bool isFirstState = statesById.Count == 0;
 
 		bool success = statesById.TryAdd(state.Id, state);
 
 		if (!success)
-			throw new ArgumentException($"A step with id '{state.Id}' is already registered.", nameof(state));
+			throw new ArgumentException($"A state with id '{state.Id}' is already registered.", nameof(state));
 
-		if (isFirstStep && InitialState == null)
+		if (isFirstState && InitialState == null)
 			InitialState = state.Id;
 	}
 
@@ -57,25 +57,9 @@ public class StateMachine<TState, TContext>
 	{
 		Start(context);
 
-		while (await MoveNextAsync())
-		{
-		}
+		while (CurrentState != null)
+			await MoveNextAsync();
 	}
-	
-	// public async Task ExecuteAllAsync(TContext context)
-	// {
-	// 	TStep? current = InitialStep;
-	//
-	// 	while (current.HasValue)
-	// 	{
-	// 		if (!steps.TryGetValue(current.Value, out IStep<TStep, TContext> step))
-	// 			throw new InvalidOperationException($"No step registered for '{current.Value}'.");
-	//
-	// 		current = await step.ExecuteAsync(context);
-	// 	}
-	// }
-
-	private TContext context;
 
 	public void Start(TContext context)
 	{
@@ -85,15 +69,15 @@ public class StateMachine<TState, TContext>
 
 	public async Task<bool> MoveNextAsync()
 	{
-		TState? currentStep = CurrentState;
+		TState? currentState = CurrentState;
 
-		if (!currentStep.HasValue)
+		if (!currentState.HasValue)
 			return false;
 
-		if (!statesById.TryGetValue(currentStep.Value, out IState<TState, TContext> step))
-			throw new InvalidOperationException($"No step registered for '{currentStep.Value}'.");
+		if (!statesById.TryGetValue(currentState.Value, out IState<TState, TContext> state))
+			throw new InvalidOperationException($"No state registered for '{currentState.Value}'.");
 
-		CurrentState = await step.ExecuteAsync(context);
+		CurrentState = await state.ExecuteAsync(context);
 
 		return true;
 	}
