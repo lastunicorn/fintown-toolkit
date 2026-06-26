@@ -4,6 +4,7 @@ Fintown Toolkit
 v1.4.0
 --------------------------------------------------------------------------------
 [new   ] Generate and publish a symbol package (.snupkg).
+[change] Upgrade CsvHelper package reference to 33.1.0
 
 
 v1.3.0
